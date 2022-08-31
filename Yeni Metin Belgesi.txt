@@ -1,0 +1,49 @@
+#!/bin/bash
+
+line=$(more /tmp/text | awk -F '|' '{print $5}' | wc -l)
+count=1
+while [ $count -le $line ]; do
+    if [ "$(awk "NR==$count { print; exit }" /tmp/text | awk -F '|' '{print $5}')" = "user logged in" ]; then
+        count=$(( $count + 1 ))
+        if [ "$(awk "NR==$count { print; exit }" /tmp/text | awk -F '|' '{print $5}')" = "user changed password" ]; then
+            count=$(( $count + 1 ))
+            if [ "$(awk "NR==$count { print; exit }" /tmp/text | awk -F '|' '{print $5}')" = "user logged off" ]; then
+                awk "NR==$count { print; exit }" /tmp/text | awk -F '|' '{print $3}'
+            fi
+        fi
+    else
+        count=$(( $count + 1 ))
+    fi
+done
+
+
+
+
+Bu görevin amacı, büyük günlük dosyası içindeki botları bulmaktır.
+Hizmetimize çok sayıda bot giriş yaptı. Hepsi aynı şeyi çok hızlı bir şekilde yaparlar: oturum açarlar, şifre değiştirirler ve oturumu kapatırlar; tüm bu eylemler bir saniye içinde kuruluyor. Görevimiz onları günlük dosyasında bulmak.
+Bash şiddetle tercih edilir
+Bash ile yapamıyorsanız Python'u deneyin.
+Lütfen aşağıdaki kriterleri karşılayan tüm profilleri gösterecek olan Bash/Python'da komut yazın:
+- kullanıcı oturum açtı, kullanıcı şifresini değiştirdi, kullanıcı aynı saniye içinde oturumu kapattı (3 işlemin tümü 1 saniye içinde yapılmalıdır);
+- bu eylemler (oturum açma, parola değiştirme, oturum kapatma) aralarında başka hiçbir şey olmadan birbiri ardına gerçekleşti.
+fxsciaqulmlk - günlük dosyasındaki tipik profil adıdır
+günlük dosyasının küçük bir kısmı:
+Mon, 22 Aug 2016 13:15:39 +0200|178.57.66.225|fxsciaqulmlk| - |user logged in| -
+Mon, 22 Aug 2016 13:15:39 +0200|178.57.66.225|fxsciaqulmlk| - |user changed password| -
+Mon, 22 Aug 2016 13:15:39 +0200|178.57.66.225|fxsciaqulmlk| - |user logged off| -
+Mon, 22 Aug 2016 13:15:42 +0200|178.57.66.225|faaaaaa11111| - |user logged in| -
+Mon, 22 Aug 2016 13:15:40 +0200|178.57.66.215|terdsfsdfsdf| - |user logged in| -
+Mon, 22 Aug 2016 13:15:49 +0200|178.57.66.215|terdsfsdfsdf| - |user changed password| -
+Mon, 22 Aug 2016 13:15:49 +0200|178.57.66.215|terdsfsdfsdf| - |user logged off| -
+Mon, 22 Aug 2016 13:15:59 +0200|178.57.66.205|erdsfsdfsdf| - |user logged in| -
+Mon, 22 Aug 2016 13:15:59 +0200|178.57.66.205|erdsfsdfsdf| - |user logged in| -
+Mon, 22 Aug 2016 13:15:59 +0200|178.57.66.205|erdsfsdfsdf| - |user changed password| -
+Mon, 22 Aug 2016 13:15:59 +0200|178.57.66.205|erdsfsdfsdf| - |user logged off| -
+Mon, 22 Aug 2016 13:17:50 +0200|178.57.66.205|abcbbabab| - |user logged in| -
+Mon, 22 Aug 2016 13:17:50 +0200|178.57.66.205|abcbbabab| - |user changed password| -
+Mon, 22 Aug 2016 13:17:50 +0200|178.57.66.205|abcbbabab| - |user changed profile| -
+Mon, 22 Aug 2016 13:17:50 +0200|178.57.66.205|abcbbabab| - |user logged off| -
+Mon, 22 Aug 2016 13:19:19 +0200|178.56.66.225|fxsciaqulmla| - |user logged in| -
+Mon, 22 Aug 2016 13:19:19 +0200|178.56.66.225|fxsciaqulmla| - |user changed password| -
+Mon, 22 Aug 2016 13:19:19 +0200|178.56.66.225|fxsciaqulmla| - |user logged off| -
+Mon, 22 Aug 2016 13:20:42 +0200|178.57.67.225|faaaa0a11111| - |user logged in| -
